@@ -1,0 +1,3 @@
+OCPlatform:
+    resource: "@OCPlatformBundle/Resources/config/routing.yml"
+    prefix:   /
