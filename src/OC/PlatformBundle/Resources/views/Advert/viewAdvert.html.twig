@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+    <h1>Annonce {{ id }}</h1>
+    <div>
+        {# On affiche tous les messages flash dont le nom est « info » #}
+        {% for message in app.session.flashbag.get('info') %}
+            <p>Message flash : {{ message }}</p>
+        {% endfor %}
+    </div>
+
+
+
+</body>
+</html>
