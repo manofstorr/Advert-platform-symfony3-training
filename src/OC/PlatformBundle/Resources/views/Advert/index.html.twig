@@ -1,12 +1,12 @@
-<!DOCTYPS html>
-<html>
-    <head>
-        <title>Bienvenue sur la plateforme</title>
-    </head>
-    <body>
-        <h1>Yeepee</h1>
-        <p>
-            Salut !
-        </p>
-    </body>
-</html>
+{% extends "OCPlatformBundle::layout.html.twig" %}
+
+{% block title %}
+    Accueil - {{ parent() }}
+{% endblock %}
+
+{% block ocplatform_body %}
+<h1>Yeepee</h1>
+<p>
+    Salut !
+</p>
+{% endblock %}
