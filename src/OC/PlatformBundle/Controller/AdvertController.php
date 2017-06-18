@@ -11,14 +11,17 @@
 
 namespace OC\PlatformBundle\Controller;
 
+// basics
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+// more for samples
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AdvertController extends Controller
 {
-    public function indexAction()
+    public function indexAction($page)
     {
         /*
          * $this->get('templating')  ? Qu'est-ce que c'est exactement ?
@@ -29,16 +32,136 @@ class AdvertController extends Controller
          * le contenu d'un template grâce à sa méthode render .
          * Ces objets, appelés services, sont une fonctionnalité phare
          * de Symfony.
-         */
-        $content = $this->get('templating')
+         * $content = $this->get('templating')
             ->render('OCPlatformBundle:Advert:index.html.twig');
-        return new Response($content);
+            return new Response($content);
+         */
+
+        if ($page < 1) {
+            // exception NotFoundHttpException, because page must be
+            throw new NotFoundHttpException('Page "' . $page . '" inexistante.');
+        }
+
+        return $this->render('OCPlatformBundle:Advert:index.html.twig');
+
     }
 
     public function viewAction($id)
     {
-        // todo : code
-        return new Response('coucou ' . $id);
+
+        return $this->render(
+            'OCPlatformBundle:Advert:viewAdvert.html.twig', array(
+                'id' => $id,
+            )
+        );
+
+    }
+
+
+    /* CRUD */
+    public function addAction(Request $request)
+    {
+
+        // Test form submit
+        if ($request->isMethod('POST')) {
+            // use of flash
+            $session = $request->getSession();
+            $session->getFlashBag()->add('info', 'Annonce bien enregistrée');
+            $session->getFlashBag()->add('info', 'Well done !');
+            return $this->redirectToRoute('oc_platform_view', array('id' => 5));
+        }
+
+        // show form
+        return $this->render('OCPlatform:Advert:add.html.twig');
+
+    }
+
+    public function editAction($id, Request $request)
+    {
+        // Test form submit
+        if ($request->isMethod('POST')) {
+            // use of flash
+            $session = $request->getSession();
+            $session->getFlashBag()->add('info', 'Annonce mise à jour');
+            $session->getFlashBag()->add('info', 'Well done !');
+            return $this->redirectToRoute('oc_platform_view', array('id' => 5));
+        }
+
+        // show form
+        return $this->render('OCPlatform:Advert:edit.html.twig');
+    }
+
+    public function deleteAction($id)
+    {
+        return $this->render('OCPlatformBundle:Advert:delete.html.twig');
+    }
+
+
+    /* SAMPLES BELOW ******************************************** */
+
+    /*
+     * A sample to use git, eat after reading
+     * Sample : Using extra-route parameters with typehint Request
+     */
+    public function goodbyeAction(Request $request)
+    {
+        $advert_id = 5;
+
+        //extra route parameters
+        $tag = $request->query->get('tag');
+
+
+        // url generators
+        //short and long method
+        $url = $this->get('router')->generate('oc_platform_home');
+        $url = $this->generateUrl('oc_platform_home');
+        // sample use of generating absolute interface
+        $url = $this->get('router')->generate('oc_platform_home', array(),
+            UrlGeneratorInterface::ABSOLUTE_URL);
+
+        // sample use of generating url from router
+        $url = $this->get('router')->generate(
+            'oc_platform_view', // 1er argument : le nom de la route
+            array('id' => $advert_id)    // 2e argument : les valeurs des paramètres
+        );
+
+        /* redirection with use Symfony\Component\HttpFoundation\RedirectResponse;
+        $url = $this->get('router')->generate('oc_platform_home');
+        return new RedirectResponse($url);
+        // or
+        return $this->redirectToRoute('oc_platform_home');
+        */
+
+        // $url vaut « /platform/advert/5 »
+        /*
+        $content = $this->get('templating')
+            ->render('OCPlatformBundle:Advert:goodbye.html.twig', array(
+                'nom' => 'David',
+                'heure' => date('H:i'),
+                'url' => $url,
+                'tag' => $tag,
+                'advert_id' => $advert_id,
+            ));
+        return new Response($content);
+        */
+
+        // Récupération de la session
+        $session = $request->getSession();
+        // On récupère le contenu de la variable user_id
+        $userId = $session->get('user_id');
+        // On définit une nouvelle valeur pour cette variable user_id
+        $session->set('user_id', 91);
+
+        // simpliest way equals what's above :
+        return $this->render(
+            'OCPlatformBundle:Advert:goodbye.html.twig', array(
+                'nom' => 'Juni',
+                'heure' => date('H:i'),
+                'url' => $url,
+                'tag' => $tag,
+                'advert_id' => $advert_id,
+            )
+        );
     }
 
     // On récupère tous les paramètres en arguments de la méthode
@@ -48,56 +171,5 @@ class AdvertController extends Controller
             "On pourrait afficher l'annonce correspondant au
             slug '" . $slug . "', créée en " . $year . " et au format " . $_format . "."
         );
-    }
-
-
-    /* CRUD */
-
-    public function addAction()
-    {
-        // todo : code
-    }
-
-    
-    /* SAMPLES BELOW */
-
-    /*
-     * A sample to use git, eat after reading
-     */
-    public function goodbyeAction()
-    {
-
-
-        //short and long method
-        $url = $this->get('router')->generate('oc_platform_home');
-        $url = $this->generateUrl('oc_platform_home');
-
-        // sample use of generating absolute interface
-        $url = $this->get('router')->generate('oc_platform_home', array(),
-            UrlGeneratorInterface::ABSOLUTE_URL);
-
-
-        $advert_id = 5;
-
-        // sample use of generating url from router
-        $url = $this->get('router')->generate(
-            'oc_platform_view', // 1er argument : le nom de la route
-            array('id' => $advert_id)    // 2e argument : les valeurs des paramètres
-        );
-
-
-        // $url vaut « /platform/advert/5 »
-        $content = $this->get('templating')
-            ->render('OCPlatformBundle:Advert:goodbye.html.twig', array(
-                'nom' => 'David',
-                'heure' => date('H:i'),
-                'url' => $url,
-                'advert_id' => $advert_id,
-            ));
-
-
-
-
-        return new Response($content);
     }
 }
